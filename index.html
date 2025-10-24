@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback Collection System</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input, textarea, select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      width: 100%;
+    }
+
+    button {
+      background: #0078d7;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #005ea8;
+    }
+
+    .feedback-list {
+      margin-top: 30px;
+    }
+
+    .feedback-item {
+      background: #f0f4f8;
+      border-left: 5px solid #0078d7;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .feedback-item h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .feedback-item small {
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Feedback Collection System</h1>
+    <form id="feedbackForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" placeholder="Enter your name" required />
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" placeholder="Enter your email" required />
+
+      <label for="rating">Rating:</label>
+      <select id="rating" required>
+        <option value="">Select a rating</option>
+        <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+        <option value="4">⭐⭐⭐⭐ Good</option>
+        <option value="3">⭐⭐⭐ Average</option>
+        <option value="2">⭐⭐ Poor</option>
+        <option value="1">⭐ Very Poor</option>
+      </select>
+
+      <label for="comments">Comments:</label>
+      <textarea id="comments" rows="4" placeholder="Write your feedback..." required></textarea>
+
+      <button type="submit">Submit Feedback</button>
+    </form>
+
+    <div class="feedback-list" id="feedbackList">
+      <h2>Submitted Feedback</h2>
+      <div id="feedbackItems"></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("feedbackForm");
+    const feedbackItems = document.getElementById("feedbackItems");
+
+    // Load stored feedback on page load
+    document.addEventListener("DOMContentLoaded", loadFeedback);
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const rating = document.getElementById("rating").value;
+      const comments = document.getElementById("comments").value.trim();
+
+      if (!name || !email || !rating || !comments) {
+        alert("Please fill out all fields before submitting.");
+        return;
+      }
+
+      const feedback = {
+        id: Date.now(),
+        name,
+        email,
+        rating,
+        comments,
+        date: new Date().toLocaleString()
+      };
+
+      saveFeedback(feedback);
+      displayFeedback(feedback);
+
+      form.reset();
+      alert("Thank you for your feedback!");
+    });
+
+    function saveFeedback(feedback) {
+      const feedbackData = JSON.parse(localStorage.getItem("feedbackData")) || [];
+      feedbackData.push(feedback);
+      localStorage.setItem("feedbackData", JSON.stringify(feedbackData));
+    }
+
+    function loadFeedback() {
+      const feedbackData = JSON.parse(localStorage.getItem("feedbackData")) || [];
+      feedbackData.forEach(displayFeedback);
+    }
+
+    function displayFeedback(feedback) {
+      const item = document.createElement("div");
+      item.classList.add("feedback-item");
+      item.innerHTML = `
+        <h3>${feedback.name} <small>(${feedback.email})</small></h3>
+        <p>Rating: ${"⭐".repeat(feedback.rating)}</p>
+        <p>${feedback.comments}</p>
+        <small>Submitted on: ${feedback.date}</small>
+      `;
+      feedbackItems.prepend(item);
+    }
+  </script>
+</body>
+</html>
